@@ -1,3 +1,6 @@
+#include <cstdio>
+#include <cstdlib>
+
 #include "cartas.h"
 
 using namespace std;
@@ -20,22 +23,28 @@ void mezclar(carta_t _mazo[], int _len, int _depth) {
 
 int main(int argc, char* argv[]) {
 
-    carta_t mazoMezcla[LEN_MAZO];
-    for(int i = 0; i < LEN_MAZO; i++) mazoMezcla[i] = mazoCompleto[i];
+    mezclar(mazoCompleto, LEN_MAZO, 20000); // mezclo el maso completo
 
-    mezclar(mazoMezcla, LEN_MAZO, 20000);
+    // paso todo el maso a una pila, como una PILA DE CARTAS
+    pila_t* pilaMesa = new pila_t();
+    for(int i = 0; i < LEN_MAZO; i++) push(pilaMesa, mazoCompleto[i]);
 
-    printf("----------------------------------------------------------");
+    // creo la pila de cartas del jugador 1 y jugador 2
+    pila_t* pilaJ1 = new pila_t();
+    pila_t* pilaJ2 = new pila_t();
 
-    for(int i = 0; i < LEN_MAZO; i++) {
-        carta_t carta = mazoMezcla[i];
-        switch(carta.palo) {
-        case BASTO: printf("%d de BASTO \n", carta.numero); break;
-        case ESPADA: printf("%d de ESPADA \n", carta.numero); break;
-        case ORO: printf("%d de ORO \n", carta.numero); break;
-        case COPAS: printf("%d de COPAS \n", carta.numero); break;
-        }
+    // reparto 3 cartas a cada jugador, repartiendo una y una
+    for(int i = i; i < 3; i++) {
+        push(pilaJ1, pop(pilaMesa));
+        push(pilaJ2, pop(pilaMesa));
     }
+
+    // printeo para el debug
+    printf("J1\n");
+    while(pilaJ1->sgte != NULL) printf("carta %d \n", pop(pilaJ1).numero);
+    printf("J2\n");
+    while(pilaJ2->sgte != NULL) printf("carta %d \n", pop(pilaJ2).numero);
+
 
     return 0;
 }

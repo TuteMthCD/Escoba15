@@ -1,6 +1,3 @@
-#include <cstdio>
-#include <cstdlib>
-
 enum palo_e {
     BASTO,
     ESPADA,
@@ -62,3 +59,24 @@ carta_t mazoCompleto[] = {
     { 11, COPAS, 9 },
     { 12, COPAS, 10 },
 };
+
+struct pila_t {
+    carta_t carta;
+    pila_t* sgte = NULL;
+};
+
+void push(pila_t*& _pila, carta_t _carta) {
+    pila_t* pointer = new pila_t(); // creo nuevo puntero
+    pointer->carta = _carta;        // agrego la carta
+    pointer->sgte = _pila;
+    _pila = pointer;
+}
+
+carta_t pop(pila_t*& _pila) {
+    carta_t carta;
+    pila_t* pointer = _pila;
+    carta = pointer->carta;
+    _pila = pointer->sgte;
+    delete pointer;
+    return carta;
+}
