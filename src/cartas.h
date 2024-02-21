@@ -1,3 +1,4 @@
+#include <cstddef>
 enum palo_e {
     BASTO,
     ESPADA,
@@ -5,13 +6,18 @@ enum palo_e {
     COPAS,
 };
 
-typedef struct {
+struct carta_t {
     unsigned int numero;
     palo_e palo;
     int valor;
-} carta_t;
 
-//#define LEN_MAZO sizeof(mazo)/sizeof(carta_t) //manera correcta de hacerlo, yo voy a tomar la incorrecta
+    // para poder comparar 2 cartas.
+    bool operator==(const carta_t& carta) const {
+        return numero == carta.numero && palo == carta.palo && valor == carta.valor;
+    }
+};
+
+// #define LEN_MAZO sizeof(mazo)/sizeof(carta_t) //manera correcta de hacerlo, yo voy a tomar la incorrecta
 #define LEN_MAZO 40
 
 carta_t mazoCompleto[] = {
@@ -60,23 +66,36 @@ carta_t mazoCompleto[] = {
     { 12, COPAS, 10 },
 };
 
-struct pila_t {
+struct list_t {
     carta_t carta;
-    pila_t* sgte = NULL;
+    list_t* sgte = NULL;
 };
 
-void push(pila_t*& _pila, carta_t _carta) {
-    pila_t* pointer = new pila_t(); // creo nuevo puntero
+void push(list_t*& _pila, carta_t _carta) {
+    list_t* pointer = new list_t(); // creo nuevo puntero
     pointer->carta = _carta;        // agrego la carta
     pointer->sgte = _pila;
     _pila = pointer;
 }
 
-carta_t pop(pila_t*& _pila) {
-    carta_t carta;
-    pila_t* pointer = _pila;
+carta_t pop(list_t*& _pila) {
+    carta_t carta = {0,BASTO,0}; 
+    list_t* pointer = _pila;
     carta = pointer->carta;
     _pila = pointer->sgte;
     delete pointer;
     return carta;
+}
+bool remove(list_t*& _pila, carta_t _carta) {
+    list_t* pointer = _pila;
+    while(pointer->sgte->sgte != NULL) {
+        if(_carta == pointer->sgte->carta) {
+            list_t* dPointer = pointer->sgte;
+            pointer->sgte = dPointer->sgte;
+            delete dPointer;
+            return true;
+        }
+        pointer = pointer->sgte;
+    }
+    return false;
 }
