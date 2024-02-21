@@ -47,23 +47,23 @@ int main(int argc, char* argv[]) {
     mezclar(mazoCompleto, LEN_MAZO, 20000, seed); // mezclo el maso completo
 
     // paso todo el maso a una pila, como una PILA DE CARTAS
-    list_t* pilaMazo = new list_t();
-    for(int i = 0; i < LEN_MAZO; i++) push(pilaMazo, mazoCompleto[i]);
+    list_t* Mazo = new list_t();
+    for(int i = 0; i < LEN_MAZO; i++) push(Mazo, mazoCompleto[i]);
 
     // creo la pila de cartas del jugador 1 y jugador 2
-    list_t* pilaJ1 = new list_t();
-    list_t* pilaJ2 = new list_t();
+    list_t* MazoJ1 = new list_t();
+    list_t* MazoJ2 = new list_t();
 
     // creo la pila de la mesa
-    list_t* pilaMesa = new list_t();
+    list_t* MazoMesa = new list_t();
 
     // reparto 3 cartas a cada jugador, repartiendo una y una
     for(int i = 0; i < 3; i++) {
-        if(pilaMazo->sgte != NULL) push(pilaJ1, pop(pilaMazo));
-        if(pilaMazo->sgte != NULL) push(pilaJ2, pop(pilaMazo));
+        if(Mazo->sgte != NULL) push(MazoJ1, pop(Mazo));
+        if(Mazo->sgte != NULL) push(MazoJ2, pop(Mazo));
     }
 
     for(int i = 0; i < 4; i++)
-        if(pilaMazo->sgte != NULL) push(pilaMesa, pop(pilaMazo));
+        if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
     return 0;
 }
