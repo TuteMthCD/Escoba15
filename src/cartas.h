@@ -71,23 +71,23 @@ struct list_t {
     list_t* sgte = NULL;
 };
 
-void push(list_t*& _pila, carta_t _carta) {
+void push(list_t*& _lista, carta_t _carta) {
     list_t* pointer = new list_t(); // creo nuevo puntero
     pointer->carta = _carta;        // agrego la carta
-    pointer->sgte = _pila;
-    _pila = pointer;
+    pointer->sgte = _lista;
+    _lista = pointer;
 }
 
-carta_t pop(list_t*& _pila) {
+carta_t pop(list_t*& _lista) {
     carta_t carta = {0,BASTO,0}; 
-    list_t* pointer = _pila;
+    list_t* pointer = _lista;
     carta = pointer->carta;
-    _pila = pointer->sgte;
+    _lista = pointer->sgte;
     delete pointer;
     return carta;
 }
-bool remove(list_t*& _pila, carta_t _carta) {
-    list_t* pointer = _pila;
+bool remove(list_t*& _lista, carta_t _carta) {
+    list_t* pointer = _lista;
     while(pointer->sgte->sgte != NULL) {
         if(_carta == pointer->sgte->carta) {
             list_t* dPointer = pointer->sgte;

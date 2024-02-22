@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -22,19 +23,37 @@ void mezclar(carta_t _mazo[], int _len, int _depth, unsigned int _seed) {
     }
 }
 
-int buscar15(list_t* _mesa, list_t* jugador) {
+bool recurMazo(list_t* _mazo, int _wanted, list_t*& _list) {
+
+    if(_wanted < 0) return 0;
+
+    if(_mazo->carta.valor == _wanted) {
+        push(_list, _mazo->carta);
+        return 1;
+    } else {
+        if(_mazo->sgte == NULL) return 0;
+        int wanted = _wanted - _mazo->carta.valor;
+        if(recurMazo(_mazo->sgte, wanted, _list)) {
+            push(_list, _mazo->carta);
+            return 1;
+        }
+        return 0;
+    }
+}
+
+bool match(list_t* _jugador, list_t* _mesa, list_t*& _list) {
     list_t* mesa = _mesa;
 
-    while(jugador->sgte != NULL) {
+    while(_jugador->sgte != NULL) {
         while(mesa->sgte != NULL) {
-            if(jugador->carta.valor + mesa->carta.valor == 15) {
-                _mesa = mesa;
+            if(recurMazo(mesa, 15 - _jugador->carta.valor, _list)) {
+                push(_list, _jugador->carta);
                 return 1;
-            } else
-                mesa = mesa->sgte;
+            }
+            mesa = mesa->sgte;
         }
         mesa = _mesa;
-        jugador = jugador->sgte;
+        _jugador = _jugador->sgte;
     }
     return 0;
 }
@@ -57,13 +76,28 @@ int main(int argc, char* argv[]) {
     // creo la pila de la mesa
     list_t* MazoMesa = new list_t();
 
-    // reparto 3 cartas a cada jugador, repartiendo una y una
-    for(int i = 0; i < 3; i++) {
-        if(Mazo->sgte != NULL) push(MazoJ1, pop(Mazo));
-        if(Mazo->sgte != NULL) push(MazoJ2, pop(Mazo));
+    // // reparto 3 cartas a cada jugador, repartiendo una y una
+    // for(int i = 0; i < 3; i++) {
+    //     if(Mazo->sgte != NULL) push(MazoJ1, pop(Mazo));
+    //     if(Mazo->sgte != NULL) push(MazoJ2, pop(Mazo));
+    // }
+    //
+    // for(int i = 0; i < 4; i++)
+    //     if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
+
+     push(MazoMesa, { 6, BASTO, 6 });
+     push(MazoMesa, { 4, BASTO, 4 });
+     push(MazoMesa, { 5, BASTO, 5 });
+    
+     push(MazoJ1, { 5, BASTO, 5 });
+
+    list_t* Escoba = new list_t();
+    match(MazoJ1, MazoMesa, Escoba);
+
+    while(Escoba->sgte != NULL) {
+        printf("%d,%d\n", Escoba->carta.valor, Escoba->carta.palo);
+        Escoba = Escoba->sgte;
     }
 
-    for(int i = 0; i < 4; i++)
-        if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
     return 0;
 }
