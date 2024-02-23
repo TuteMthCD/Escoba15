@@ -79,7 +79,7 @@ void push(list_t*& _lista, carta_t _carta) {
 }
 
 carta_t pop(list_t*& _lista) {
-    carta_t carta = {0,BASTO,0}; 
+    carta_t carta = { 0, BASTO, 0 };
     list_t* pointer = _lista;
     carta = pointer->carta;
     _lista = pointer->sgte;
@@ -88,14 +88,20 @@ carta_t pop(list_t*& _lista) {
 }
 bool remove(list_t*& _lista, carta_t _carta) {
     list_t* pointer = _lista;
-    while(pointer->sgte->sgte != NULL) {
-        if(_carta == pointer->sgte->carta) {
-            list_t* dPointer = pointer->sgte;
-            pointer->sgte = dPointer->sgte;
-            delete dPointer;
-            return true;
-        }
-        pointer = pointer->sgte;
+
+    if(pointer->carta == _carta) {
+        _lista = pointer->sgte;
+        delete pointer;
     }
+
+    while(pointer->sgte != NULL) {
+        if(pointer->sgte->carta == _carta) {
+            list_t* dpointer = pointer->sgte;
+            pointer->sgte = dpointer->sgte;
+            delete dpointer;
+        } else
+            pointer = pointer->sgte;
+    }
+
     return false;
 }
