@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -47,7 +48,7 @@ bool recurMazo(list_t* _mazo, int _wanted, list_t*& _list) {
     return 0; // significa que no hay ninguna combinacion posible
 }
 
-bool escoba(list_t*& _mesa, list_t*& _jugador, list_t*& _casita) {
+bool junte15(list_t*& _mesa, list_t*& _jugador, list_t*& _casita) {
     list_t* jugador = _jugador;
     list_t* mesa = _mesa;
 
@@ -100,7 +101,7 @@ int main(int argc, char* argv[]) {
 
     using namespace std;
 
-    unsigned int seed = (unsigned int)time(nullptr);
+    int seed = time(nullptr);
     cout << "Semilla: " << seed << endl;
 
 
@@ -115,39 +116,47 @@ int main(int argc, char* argv[]) {
 
     // creo la pila de cartas del jugador 1 y jugador 2
     // y tambien sus casitas(?)
-    list_t* MazoJ1 = new list_t();
-    list_t* EscobaJ1 = new list_t();
-    list_t* MazoJ2 = new list_t();
-    list_t* EscobaJ2 = new list_t();
+    list_t* ManoJ1 = new list_t();
+    list_t* junteJ1 = new list_t();
+    list_t* ManoJ2 = new list_t();
+    list_t* JunteJ2 = new list_t();
 
 
     // Empieza la partida
+    // reparto 3 cartas a cada jugador, repartiendo una y una
+    for(int i = 0; i < 3; i++) {
+        if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
+        if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
+    }
+    // suelto 4 cartas a la mesa;
+    for(int i = 0; i < 4; i++)
+        if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
 
-    while(Mazo->sgte != NULL) { // el juego termina cuando el mazo no tiene mas cartas.
-
-        // reparto 3 cartas a cada jugador, repartiendo una y una
-        for(int i = 0; i < 3; i++) {
-            if(Mazo->sgte != NULL) push(MazoJ1, pop(Mazo));
-            if(Mazo->sgte != NULL) push(MazoJ2, pop(Mazo));
+    do { // el juego termina cuando el mazo no tiene mas cartas.
+        if(junte15(MazoMesa, ManoJ1, junteJ1) == 0) {
+            if(ManoJ1->sgte != NULL) push(MazoMesa, pop(ManoJ1));
+        }
+        if(junte15(MazoMesa, ManoJ2, JunteJ2) == 0) {
+            if(ManoJ2->sgte != NULL) push(MazoMesa, pop(ManoJ2));
         }
 
-        // suelto 4 cartas a la mesa;
-        for(int i = 0; i < 4; i++)
-            if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
 
-
-        escoba(MazoMesa, MazoJ1, EscobaJ1); // busco escoba en MazoJ1 y lo guardo en EscobaJ1
-        escoba(MazoMesa, MazoJ2, EscobaJ2); // busco escoba en MazoJ2 y lo guardo es EscobaJ2
-    }
+        if(ManoJ1->sgte == NULL && ManoJ2->sgte == NULL) {
+            for(int i = 0; i < 3; i++) {
+                if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
+                if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
+            }
+        }
+    } while(Mazo->sgte != NULL || ManoJ1->sgte != NULL || ManoJ2->sgte != NULL);
 
 
     printCartas(Mazo, "Mazo");
+
+    printCartas(ManoJ1, "ManoJ1");
+    printCartas(junteJ1, "JunteJ1");
+    printCartas(ManoJ2, "ManoJ2");
+    printCartas(JunteJ2, "JunteJ2");
+
     printCartas(MazoMesa, "Mesa");
-
-    printCartas(MazoJ1, "MazoJ1");
-    printCartas(EscobaJ1, "EscobaJ1");
-    printCartas(MazoJ1, "MazoJ1");
-    printCartas(EscobaJ2, "EscobaJ2");
-
     return 0;
 }
