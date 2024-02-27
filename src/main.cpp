@@ -167,6 +167,7 @@ int main(int argc, char* argv[]) {
     do {
         cout << "Semilla: " << seed << endl;
 
+        cout << "Se mezcla el mazo 20000 veces" << endl;
         mezclar(mazoCompleto, LEN_MAZO, 20000, seed); // mezclo el maso completo
 
         // paso todo el maso a una lista, como una PILA DE CARTAS
@@ -176,6 +177,10 @@ int main(int argc, char* argv[]) {
 
         // Empieza la partida
         // reparto 3 cartas a cada jugador, repartiendo una y una
+
+        cout << "Pulsa para Repartir" << endl;
+        // getchar();
+
         for(int i = 0; i < 3; i++) {
             if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
             if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
@@ -184,13 +189,18 @@ int main(int argc, char* argv[]) {
         for(int i = 0; i < 4; i++)
             if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
 
+
         do { // el juego termina cuando el mazo no tiene mas cartas.
 
+            printCartas(ManoJ1, "ManoJ1");
+            printCartas(ManoJ2, "ManoJ2");
+            printCartas(MazoMesa, "Mesa");
+            // getchar();
             if(junte15(MazoMesa, ManoJ1, JunteJ1)) {
 
                 if(MazoMesa->sgte == NULL) {
                     PuntosJ1++;
-                    cout << "ESCOBA J1" << endl;
+                    cout << "-ESCOBA J1" << endl;
                 }
 
                 ultimo = 0;
@@ -202,11 +212,11 @@ int main(int argc, char* argv[]) {
 
                 if(MazoMesa->sgte == NULL) {
                     PuntosJ2++;
-                    cout << "ESCOBA J2" << endl;
+                    cout << "-ESCOBA J2" << endl;
                 }
-                
+
                 ultimo = 1;
-            
+
             } else {
                 if(ManoJ2->sgte != NULL) push(MazoMesa, pop(ManoJ2));
             }
@@ -223,8 +233,9 @@ int main(int argc, char* argv[]) {
 
         } while(Mazo->sgte != NULL || ManoJ1->sgte != NULL || ManoJ2->sgte != NULL);
 
-        // printCartas(MazoMesa, "Mesa");
+        printCartas(MazoMesa, "SOBRA");
         // le da las cartas al ultimo jugador en levantar
+        //
         if(ultimo == 0) {
             while(MazoMesa->sgte != NULL) push(JunteJ1, pop(MazoMesa));
         } else
@@ -232,8 +243,8 @@ int main(int argc, char* argv[]) {
 
         conteo(JunteJ1, JunteJ2, PuntosJ1, PuntosJ2);
 
-        printCartas(JunteJ1, "JunteJ1");
-        printCartas(JunteJ2, "JunteJ2");
+        // printCartas(JunteJ1, "JunteJ1");
+        // printCartas(JunteJ2, "JunteJ2");
 
         cout << "PuntosJ1:" << PuntosJ1 << " PuntosJ2:" << PuntosJ2 << endl;
 
@@ -246,8 +257,13 @@ int main(int argc, char* argv[]) {
         clean(JunteJ2);
 
         cout << "--------------- TERMINO LA RONDA -------------------------" << endl;
+        // getchar();
+    } while(PuntosJ1 < 15 && PuntosJ2 < 15 || PuntosJ1 == PuntosJ2);
 
-    } while(PuntosJ1 < 15 && PuntosJ2 < 15);
-    cout << "Puntos FINAL J1:" << PuntosJ1 << " Puntos FINAL J2:" << PuntosJ2 << endl;
+    if(PuntosJ1 > PuntosJ2){
+        cout << "Gano Jugador 1 con: " << PuntosJ1 << " Puntos";
+    }else{
+        cout << "Gano Jugador 2 con: " << PuntosJ2 << " Puntos";
+    }
     return 0;
 }
