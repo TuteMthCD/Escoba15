@@ -1,11 +1,116 @@
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
+#include <ctime> // para obtener aleatorios.
 #include <iostream>
-#include <ostream>
 
-#include "cartas.h"
+enum palo_e {
+    BASTO,
+    ESPADA,
+    ORO,
+    COPAS,
+};
+
+struct carta_t {
+    unsigned int numero;
+    palo_e palo;
+    int valor;
+
+    // para poder comparar 2 cartas.
+    bool operator==(const carta_t& carta) const {
+        return numero == carta.numero && palo == carta.palo && valor == carta.valor;
+    }
+};
+
+// #define LEN_MAZO sizeof(mazo)/sizeof(carta_t) //manera correcta de hacerlo, yo voy a tomar la incorrecta
+#define LEN_MAZO 40
+
+carta_t mazoCompleto[] = {
+    { 1, BASTO, 1 },
+    { 2, BASTO, 2 },
+    { 3, BASTO, 3 },
+    { 4, BASTO, 4 },
+    { 5, BASTO, 5 },
+    { 6, BASTO, 6 },
+    { 7, BASTO, 7 },
+    { 10, BASTO, 8 },
+    { 11, BASTO, 9 },
+    { 12, BASTO, 10 },
+
+    { 1, ESPADA, 1 },
+    { 2, ESPADA, 2 },
+    { 3, ESPADA, 3 },
+    { 4, ESPADA, 4 },
+    { 5, ESPADA, 5 },
+    { 6, ESPADA, 6 },
+    { 7, ESPADA, 7 },
+    { 10, ESPADA, 8 },
+    { 11, ESPADA, 9 },
+    { 12, ESPADA, 10 },
+
+    { 1, ORO, 1 },
+    { 2, ORO, 2 },
+    { 3, ORO, 3 },
+    { 4, ORO, 4 },
+    { 5, ORO, 5 },
+    { 6, ORO, 6 },
+    { 7, ORO, 7 },
+    { 10, ORO, 8 },
+    { 11, ORO, 9 },
+    { 12, ORO, 10 },
+
+    { 1, COPAS, 1 },
+    { 2, COPAS, 2 },
+    { 3, COPAS, 3 },
+    { 4, COPAS, 4 },
+    { 5, COPAS, 5 },
+    { 6, COPAS, 6 },
+    { 7, COPAS, 7 },
+    { 10, COPAS, 8 },
+    { 11, COPAS, 9 },
+    { 12, COPAS, 10 },
+};
+
+struct list_t {
+    carta_t carta;
+    list_t* sgte = NULL;
+};
+
+void push(list_t*& _lista, carta_t _carta) {
+    list_t* pointer = new list_t(); // creo nuevo puntero
+    pointer->carta = _carta;        // agrego la carta
+    pointer->sgte = _lista;
+    _lista = pointer;
+}
+
+carta_t pop(list_t*& _lista) {
+    carta_t carta = { 0, BASTO, 0 };
+    list_t* pointer = _lista;
+    carta = pointer->carta;
+    _lista = pointer->sgte;
+    delete pointer;
+    return carta;
+}
+bool remove(list_t*& _lista, carta_t _carta) {
+    list_t* pointer = _lista;
+
+    if(pointer->carta == _carta) {
+        _lista = pointer->sgte;
+        delete pointer;
+    }
+
+    while(pointer->sgte != NULL) {
+        if(pointer->sgte->carta == _carta) {
+            list_t* dpointer = pointer->sgte;
+            pointer->sgte = dpointer->sgte;
+            delete dpointer;
+        } else
+            pointer = pointer->sgte;
+    }
+
+    return false;
+}
+
+void clean(list_t*& _lista) {
+    while(_lista->sgte != NULL) { pop(_lista); }
+}
 
 void mezclar(carta_t _mazo[], int _len, int _depth, unsigned int _seed) {
     for(int i = 0; i < _depth; i++) {
@@ -75,7 +180,7 @@ bool junte15(list_t*& _mesa, list_t*& _jugador, list_t*& _casita) {
     return 0;
 }
 
-void printCartas(list_t* _lista, std::string _name) {
+void printCartas(list_t* _lista,const char* _name) {
     using namespace std;
 
     cout << "-------------" << _name << "------------" << endl;
@@ -260,9 +365,15 @@ int main(int argc, char* argv[]) {
         // getchar();
     } while(PuntosJ1 < 15 && PuntosJ2 < 15 || PuntosJ1 == PuntosJ2);
 
-    if(PuntosJ1 > PuntosJ2){
+    // 17 < 15 = 0;
+    // 17 < 15 = 0;
+    // 17 == 17 = 1;
+    //
+    // 0.0+1 = 1;
+
+    if(PuntosJ1 > PuntosJ2) {
         cout << "Gano Jugador 1 con: " << PuntosJ1 << " Puntos";
-    }else{
+    } else {
         cout << "Gano Jugador 2 con: " << PuntosJ2 << " Puntos";
     }
     return 0;
