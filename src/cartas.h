@@ -105,3 +105,9 @@ bool remove(list_t*& _lista, carta_t _carta) {
 
     return false;
 }
+
+void clean(list_t*& _lista){
+    while (_lista ->sgte != NULL) {
+        pop(_lista);
+    }
+}

@@ -97,66 +97,157 @@ void printCartas(list_t* _lista, std::string _name) {
     }
 }
 
+void conteo(list_t* J1, list_t* J2, int& PuntosJ1, int& PuntosJ2) {
+    int Cartas_J1 = 0, ORO_J1 = 0, C7_J1 = 0;
+    int Cartas_J2 = 0, ORO_J2 = 0, C7_J2 = 0;
+
+    while(J1->sgte != NULL) {
+        Cartas_J1++;
+
+        if(J1->carta.palo == ORO) ORO_J1++;
+
+        if(J1->carta.numero == 7) C7_J1++;
+
+        if(J1->carta.numero == 7 && J1->carta.palo == ORO) PuntosJ1++;
+
+        J1 = J1->sgte;
+    }
+    while(J2->sgte != NULL) {
+        Cartas_J2++;
+
+        if(J2->carta.palo == ORO) ORO_J2++;
+
+        if(J2->carta.numero == 7) C7_J2++;
+
+        if(J2->carta.numero == 7 && J2->carta.palo == ORO) PuntosJ2++;
+
+        J2 = J2->sgte;
+    }
+
+    if(Cartas_J1 != Cartas_J2) {
+        if(Cartas_J1 > Cartas_J2)
+            PuntosJ1++;
+        else
+            PuntosJ2++;
+    }
+
+    if(C7_J1 != C7_J2) {
+        if(C7_J1 > C7_J2)
+            PuntosJ1++;
+        else
+            PuntosJ2++;
+    }
+
+    if(ORO_J1 != ORO_J2) {
+        if(ORO_J1 > ORO_J2)
+            PuntosJ1++;
+        else
+            PuntosJ2++;
+    }
+}
+
 int main(int argc, char* argv[]) {
 
     using namespace std;
 
-    int seed = time(nullptr);
-    cout << "Semilla: " << seed << endl;
-
-
-    mezclar(mazoCompleto, LEN_MAZO, 20000, seed); // mezclo el maso completo
-
-    // paso todo el maso a una lista, como una PILA DE CARTAS
-    list_t* Mazo = new list_t();
-    for(int i = 0; i < LEN_MAZO; i++) push(Mazo, mazoCompleto[i]);
-
+    int PuntosJ1 = 0, PuntosJ2 = 0;
     // creo la pila de la mesa
     list_t* MazoMesa = new list_t();
 
     // creo la pila de cartas del jugador 1 y jugador 2
     // y tambien sus casitas(?)
     list_t* ManoJ1 = new list_t();
-    list_t* junteJ1 = new list_t();
+    list_t* JunteJ1 = new list_t();
     list_t* ManoJ2 = new list_t();
     list_t* JunteJ2 = new list_t();
+    list_t* Mazo = new list_t();
 
+    int seed = time(nullptr);
 
-    // Empieza la partida
-    // reparto 3 cartas a cada jugador, repartiendo una y una
-    for(int i = 0; i < 3; i++) {
-        if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
-        if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
-    }
-    // suelto 4 cartas a la mesa;
-    for(int i = 0; i < 4; i++)
-        if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
+    do {
+        cout << "Semilla: " << seed << endl;
 
-    do { // el juego termina cuando el mazo no tiene mas cartas.
-        if(junte15(MazoMesa, ManoJ1, junteJ1) == 0) {
-            if(ManoJ1->sgte != NULL) push(MazoMesa, pop(ManoJ1));
+        mezclar(mazoCompleto, LEN_MAZO, 20000, seed); // mezclo el maso completo
+
+        // paso todo el maso a una lista, como una PILA DE CARTAS
+        for(int i = 0; i < LEN_MAZO; i++) push(Mazo, mazoCompleto[i]);
+
+        bool ultimo = 0; // variable para saber quien es el ultimo en juntar
+
+        // Empieza la partida
+        // reparto 3 cartas a cada jugador, repartiendo una y una
+        for(int i = 0; i < 3; i++) {
+            if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
+            if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
         }
-        if(junte15(MazoMesa, ManoJ2, JunteJ2) == 0) {
-            if(ManoJ2->sgte != NULL) push(MazoMesa, pop(ManoJ2));
-        }
+        // suelto 4 cartas a la mesa;
+        for(int i = 0; i < 4; i++)
+            if(Mazo->sgte != NULL) push(MazoMesa, pop(Mazo));
 
+        do { // el juego termina cuando el mazo no tiene mas cartas.
 
-        if(ManoJ1->sgte == NULL && ManoJ2->sgte == NULL) {
-            for(int i = 0; i < 3; i++) {
-                if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
-                if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
+            if(junte15(MazoMesa, ManoJ1, JunteJ1)) {
+
+                if(MazoMesa->sgte == NULL) {
+                    PuntosJ1++;
+                    cout << "ESCOBA J1" << endl;
+                }
+
+                ultimo = 0;
+
+            } else {
+                if(ManoJ1->sgte != NULL) push(MazoMesa, pop(ManoJ1));
             }
-        }
-    } while(Mazo->sgte != NULL || ManoJ1->sgte != NULL || ManoJ2->sgte != NULL);
+            if(junte15(MazoMesa, ManoJ2, JunteJ2)) {
+
+                if(MazoMesa->sgte == NULL) {
+                    PuntosJ2++;
+                    cout << "ESCOBA J2" << endl;
+                }
+                
+                ultimo = 1;
+            
+            } else {
+                if(ManoJ2->sgte != NULL) push(MazoMesa, pop(ManoJ2));
+            }
 
 
-    printCartas(Mazo, "Mazo");
+            // cuando los 2 se quedan sin cartas reparte 3 a cada uno, una y una.
+            if(ManoJ1->sgte == NULL && ManoJ2->sgte == NULL) {
+                for(int i = 0; i < 3; i++) {
+                    if(Mazo->sgte != NULL) push(ManoJ1, pop(Mazo));
+                    if(Mazo->sgte != NULL) push(ManoJ2, pop(Mazo));
+                }
+            }
 
-    printCartas(ManoJ1, "ManoJ1");
-    printCartas(junteJ1, "JunteJ1");
-    printCartas(ManoJ2, "ManoJ2");
-    printCartas(JunteJ2, "JunteJ2");
 
-    printCartas(MazoMesa, "Mesa");
+        } while(Mazo->sgte != NULL || ManoJ1->sgte != NULL || ManoJ2->sgte != NULL);
+
+        // printCartas(MazoMesa, "Mesa");
+        // le da las cartas al ultimo jugador en levantar
+        if(ultimo == 0) {
+            while(MazoMesa->sgte != NULL) push(JunteJ1, pop(MazoMesa));
+        } else
+            while(MazoMesa->sgte != NULL) push(JunteJ2, pop(MazoMesa));
+
+        conteo(JunteJ1, JunteJ2, PuntosJ1, PuntosJ2);
+
+        printCartas(JunteJ1, "JunteJ1");
+        printCartas(JunteJ2, "JunteJ2");
+
+        cout << "PuntosJ1:" << PuntosJ1 << " PuntosJ2:" << PuntosJ2 << endl;
+
+        seed++;
+
+        clean(MazoMesa);
+        clean(ManoJ1);
+        clean(ManoJ2);
+        clean(JunteJ1);
+        clean(JunteJ2);
+
+        cout << "--------------- TERMINO LA RONDA -------------------------" << endl;
+
+    } while(PuntosJ1 < 15 && PuntosJ2 < 15);
+    cout << "Puntos FINAL J1:" << PuntosJ1 << " Puntos FINAL J2:" << PuntosJ2 << endl;
     return 0;
 }
